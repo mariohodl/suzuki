@@ -259,10 +259,10 @@ export default function SurveyPage() {
                     <div className="flex gap-3">
                       <button
                         onClick={handleSkipSuggestion}
-                        className="px-5 py-3 rounded-xl font-semibold transition-all duration-200 active:scale-95"
+                        className="px-5 py-3 rounded-xl font-bold underline transition-all duration-200 active:scale-95"
                         style={{
-                          color: '#64748B',
-                          background: '#F1F5F9',
+                          color: '#003087',
+                          background: '#E2E8F0',
                           fontSize: 'clamp(13px, 1.8vw, 16px)',
                         }}
                       >

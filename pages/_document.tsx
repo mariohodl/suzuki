@@ -17,6 +17,7 @@ export default function Document() {
         <meta name="msapplication-tap-highlight" content="no" />
         <meta name="theme-color" content="#003087" />
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
