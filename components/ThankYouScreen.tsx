@@ -6,7 +6,7 @@ interface ThankYouScreenProps {
 }
 
 export default function ThankYouScreen({ onReset }: ThankYouScreenProps) {
-  const [countdown, setCountdown] = useState(6);
+  const [countdown, setCountdown] = useState(7);
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
@@ -98,22 +98,8 @@ export default function ThankYouScreen({ onReset }: ThankYouScreenProps) {
         </div>
 
         {/* Logo */}
-        <div className="mb-6 opacity-90">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 240 80"
-            width="180"
-            height="60"
-            aria-label="Suzuki"
-          >
-            <g transform="translate(0, 5)">
-              <polygon points="35,0 60,25 35,50 10,25" fill="#E31837" />
-              <path d="M35 10 C42 10 48 14 48 20 C48 24 45 27 40 28 L30 30 C25 31 22 34 22 38 C22 44 28 48 35 48" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round" />
-              <path d="M35 12 L44 12 C47 12 49 14 49 17" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round" />
-              <path d="M35 46 L26 46 C23 46 21 44 21 41" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round" />
-            </g>
-            <text x="72" y="52" fontFamily="'Arial Black', 'Arial', sans-serif" fontWeight="900" fontSize="36" fill="white" letterSpacing="1">SUZUKI</text>
-          </svg>
+        <div className="mb-6 bg-white/95 p-4 rounded-2xl shadow-xl flex items-center justify-center">
+          <SuzukiLogo size="md" />
         </div>
 
         {/* Thank you text */}
@@ -183,7 +169,7 @@ export default function ThankYouScreen({ onReset }: ThankYouScreenProps) {
               className="h-full rounded-full"
               style={{
                 background: '#FFD740',
-                animation: 'countdown 6s linear forwards',
+                animation: 'countdown 7s linear forwards',
               }}
             />
           </div>
