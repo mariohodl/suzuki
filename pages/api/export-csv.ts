@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let csvContent = '\uFEFF';
     
     // Header
-    csvContent += 'Fecha,Sucursal,Satisfacción de Visita,Claridad del Servicio,Sugerencias\n';
+    csvContent += 'Fecha,Sucursal,Satisfacción de Visita,Claridad del Servicio,¿Unirse a Promociones?,Sugerencias\n';
 
     // Rows
     responses.forEach((r: any) => {
@@ -46,10 +46,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const branchStr = r.branch || 'Principal';
       const visitStr = r.visitSatisfaction || '';
       const clarityStr = r.clarityOfService || '';
+      const promotionsStr = r.joinPromotions === 'si' ? 'Sí' : r.joinPromotions === 'no' ? 'No' : '';
       // Escape double quotes and wrap in quotes to preserve formatting
       const suggestionStr = r.suggestion ? `"${r.suggestion.replace(/"/g, '""')}"` : '""';
 
-      csvContent += `${dateStr},"${branchStr}","${visitStr}","${clarityStr}",${suggestionStr}\n`;
+      csvContent += `${dateStr},"${branchStr}","${visitStr}","${clarityStr}","${promotionsStr}",${suggestionStr}\n`;
     });
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');

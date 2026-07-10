@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ISurveyResponse extends Document {
   visitSatisfaction: 'buena' | 'regular' | 'mala';
   clarityOfService: 'muy_claros' | 'regular' | 'nada_claros';
+  joinPromotions: 'si' | 'no';
   suggestion: string;
   createdAt: Date;
   branch?: string;
@@ -18,6 +19,11 @@ const SurveyResponseSchema: Schema = new Schema(
     clarityOfService: {
       type: String,
       enum: ['muy_claros', 'regular', 'nada_claros'],
+      required: true,
+    },
+    joinPromotions: {
+      type: String,
+      enum: ['si', 'no'],
       required: true,
     },
     suggestion: {

@@ -7,11 +7,13 @@ import Head from 'next/head';
 
 type VisitRating = 'buena' | 'regular' | 'mala' | null;
 type ClarityRating = 'muy_claros' | 'regular' | 'nada_claros' | null;
+type JoinPromotions = 'si' | 'no' | null;
 
 interface SurveyState {
-  step: 0 | 1 | 2 | 3; // 0=q1, 1=q2, 2=suggestion, 3=thankyou
+  step: 0 | 1 | 2 | 3 | 4; // 0=q1, 1=q2, 2=promotions, 3=suggestion, 4=thankyou
   visitSatisfaction: VisitRating;
   clarityOfService: ClarityRating;
+  joinPromotions: JoinPromotions;
   suggestion: string;
 }
 
@@ -19,6 +21,7 @@ const initialState: SurveyState = {
   step: 0,
   visitSatisfaction: null,
   clarityOfService: null,
+  joinPromotions: null,
   suggestion: '',
 };
 
@@ -67,6 +70,7 @@ export default function SurveyPage() {
         body: JSON.stringify({
           visitSatisfaction: survey.visitSatisfaction,
           clarityOfService: survey.clarityOfService,
+          joinPromotions: survey.joinPromotions,
           suggestion: survey.suggestion,
         }),
       });
@@ -74,12 +78,12 @@ export default function SurveyPage() {
       console.error('Error submitting survey:', err);
     } finally {
       setIsSubmitting(false);
-      goToStep(3);
+      goToStep(4);
     }
   }, [survey, isSubmitting, goToStep]);
 
   const handleSkipSuggestion = useCallback(() => {
-    goToStep(3);
+    goToStep(4);
     // Still submit without suggestion
     fetch('/api/survey', {
       method: 'POST',
@@ -87,6 +91,7 @@ export default function SurveyPage() {
       body: JSON.stringify({
         visitSatisfaction: survey.visitSatisfaction,
         clarityOfService: survey.clarityOfService,
+        joinPromotions: survey.joinPromotions,
         suggestion: '',
       }),
     }).catch(console.error);
@@ -97,9 +102,18 @@ export default function SurveyPage() {
     setSlideDir('in');
   }, []);
 
+  const handlePromotionsSelect = useCallback(
+    (val: JoinPromotions) => {
+      if (isTransitioning) return;
+      setSurvey((prev) => ({ ...prev, joinPromotions: val }));
+      setTimeout(() => goToStep(3), 350);
+    },
+    [goToStep, isTransitioning]
+  );
+
   // Keyboard support for tablets with external keyboard
   useEffect(() => {
-    if (survey.step === 2) return;
+    if (survey.step === 3) return;
     const handler = (e: KeyboardEvent) => {
       if (survey.step === 0) {
         if (e.key === '1') handleVisitSelect('buena');
@@ -111,12 +125,16 @@ export default function SurveyPage() {
         if (e.key === '2') handleClaritySelect('regular');
         if (e.key === '3') handleClaritySelect('nada_claros');
       }
+      if (survey.step === 2) {
+        if (e.key === '1') handlePromotionsSelect('si');
+        if (e.key === '2') handlePromotionsSelect('no');
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [survey.step, handleVisitSelect, handleClaritySelect]);
+  }, [survey.step, handleVisitSelect, handleClaritySelect, handlePromotionsSelect]);
 
-  if (survey.step === 3) {
+  if (survey.step === 4) {
     return <ThankYouScreen onReset={handleReset} />;
   }
 
@@ -227,8 +245,31 @@ export default function SurveyPage() {
               </QuestionSlide>
             )}
 
-            {/* Step 3: Suggestion */}
+            {/* Step 3: Join Promotions */}
             {survey.step === 2 && (
+              <QuestionSlide
+                question="¿Le gustaría ser parte de nuevos lanzamientos y promociones?"
+                subtitle="Selecciona tu preferencia para recibir información"
+              >
+                <div className="flex items-center justify-center gap-6 md:gap-10 w-full">
+                  <FaceButton
+                    mood="happy"
+                    label="Sí"
+                    selected={survey.joinPromotions === 'si'}
+                    onClick={() => handlePromotionsSelect('si')}
+                  />
+                  <FaceButton
+                    mood="sad"
+                    label="No"
+                    selected={survey.joinPromotions === 'no'}
+                    onClick={() => handlePromotionsSelect('no')}
+                  />
+                </div>
+              </QuestionSlide>
+            )}
+
+            {/* Step 4: Suggestion */}
+            {survey.step === 3 && (
               <QuestionSlide
                 question="¿Tienes alguna sugerencia para mejorar nuestro servicio?"
                 subtitle="Tu opinión es muy importante para nosotros (opcional)"
@@ -259,7 +300,7 @@ export default function SurveyPage() {
                     <div className="flex gap-3 w-full sm:w-auto justify-end">
                       <button
                         onClick={handleSkipSuggestion}
-                        className="flex-1 sm:flex-none px-5 py-3 rounded-xl font-bold underline transition-all duration-200 active:scale-95 text-center"
+                        className="flex-1 sm:flex-none px-5 py-3 rounded-xl font-bold transition-all duration-200 active:scale-95 text-center"
                         style={{
                           color: '#003087',
                           background: '#E2E8F0',
@@ -295,9 +336,9 @@ export default function SurveyPage() {
           className="flex flex-col items-center gap-3 py-5 flex-shrink-0"
           style={{ borderTop: '1px solid #E2E8F0' }}
         >
-          <StepDots total={3} current={survey.step} />
+          <StepDots total={4} current={survey.step} />
           <p className="text-xs" style={{ color: '#94A3B8' }}>
-            Paso {survey.step + 1} de 3
+            Paso {survey.step + 1} de 4
           </p>
         </div>
       </div>

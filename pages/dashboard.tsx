@@ -36,6 +36,7 @@ interface SuggestionItem {
   _id: string;
   visitSatisfaction: 'buena' | 'regular' | 'mala';
   clarityOfService: 'muy_claros' | 'regular' | 'nada_claros';
+  joinPromotions: 'si' | 'no';
   suggestion: string;
   branch: string;
   createdAt: string;
@@ -45,6 +46,7 @@ interface StatsData {
   total: number;
   visitStats: StatItem[];
   clarityStats: StatItem[];
+  joinPromotionsStats: StatItem[];
   recent: SuggestionItem[];
   branches: string[];
 }
@@ -61,12 +63,19 @@ const CLARITY_COLORS: Record<string, string> = {
   nada_claros: '#E31837', // Suzuki Red
 };
 
+const PROMOTIONS_COLORS: Record<string, string> = {
+  si: '#10B981',   // Emerald green
+  no: '#E31837',   // Suzuki Red
+};
+
 const LABEL_MAP: Record<string, string> = {
   buena: 'Buena',
   regular: 'Regular',
   mala: 'Mala',
   muy_claros: 'Muy claros',
   nada_claros: 'Nada claros',
+  si: 'Sí',
+  no: 'No',
 };
 
 export default function Dashboard() {
@@ -166,6 +175,13 @@ export default function Dashboard() {
     return Math.round((getClarityCount('muy_claros') / total) * 100);
   };
 
+  // Promotions interest percentage
+  const calculatePromotionsPct = () => {
+    if (total === 0) return 0;
+    const count = data?.joinPromotionsStats.find(item => item._id === 'si')?.count || 0;
+    return Math.round((count / total) * 100);
+  };
+
   // Format Charts
   const visitChartData = data?.visitStats.map(item => ({
     name: LABEL_MAP[item._id] || item._id,
@@ -181,9 +197,17 @@ export default function Dashboard() {
     percentage: total > 0 ? ((item.count / total) * 100).toFixed(1) : '0',
   })) || [];
 
+  const promotionsChartData = data?.joinPromotionsStats.map(item => ({
+    name: LABEL_MAP[item._id] || item._id,
+    id: item._id,
+    count: item.count,
+    percentage: total > 0 ? ((item.count / total) * 100).toFixed(1) : '0',
+  })) || [];
+
   const getMoodIcon = (mood: string) => {
-    if (mood === 'buena' || mood === 'muy_claros') return <Smile className="w-4 h-4 text-emerald-600" />;
+    if (mood === 'buena' || mood === 'muy_claros' || mood === 'si') return <Smile className="w-4 h-4 text-emerald-600" />;
     if (mood === 'regular') return <Meh className="w-4 h-4 text-amber-500" />;
+    if (mood === 'no') return <Frown className="w-4 h-4 text-rose-500" />;
     return <Frown className="w-4 h-4 text-rose-500" />;
   };
 
@@ -249,6 +273,7 @@ export default function Dashboard() {
 
   const nsi = calculateNSI();
   const clarityPct = calculateClarityPct();
+  const promotionsPct = calculatePromotionsPct();
 
   return (
     <div className="min-h-screen bg-[#f0f4f8] font-sans text-gray-800 pb-12">
@@ -326,7 +351,7 @@ export default function Dashboard() {
         </section>
 
         {/* Key Performance Indicators (KPIs) */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Card 1: Total Muestras */}
           <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
             <div>
@@ -364,10 +389,22 @@ export default function Dashboard() {
               <Smile className="w-6 h-6 text-[#003087]" />
             </div>
           </div>
+
+          {/* Card 4: Promotions Interest */}
+          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 font-sans">Interés en Promociones</p>
+              <h3 className="text-3xl font-black text-emerald-600">{promotionsPct}%</h3>
+              <p className="text-xs text-gray-500 mt-2">% interesados en nuevos lanzamientos</p>
+            </div>
+            <div className="bg-emerald-50 p-4 rounded-2xl">
+              <TrendingUp className="w-6 h-6 text-emerald-600" />
+            </div>
+          </div>
         </section>
 
         {/* Charts Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Card: Satisfacción de Visita */}
           <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-between">
@@ -486,6 +523,65 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
+
+          {/* Card: Interés en Promociones */}
+          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-lg font-bold text-[#003087]">Interés en Promociones</h2>
+                  <p className="text-xs text-gray-500">¿Le gustaría ser parte de nuevos lanzamientos y promociones?</p>
+                </div>
+              </div>
+
+              {total === 0 ? (
+                <div className="h-64 flex flex-col items-center justify-center text-gray-400">
+                  <HelpCircle className="w-12 h-12 mb-2 text-gray-300" />
+                  <p className="text-sm">Sin datos para mostrar en este rango</p>
+                </div>
+              ) : (
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={promotionsChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                      <XAxis dataKey="name" stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                      <YAxis stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                      <Tooltip
+                        cursor={{ fill: '#f8fafc' }}
+                        contentStyle={{ 
+                          backgroundColor: '#ffffff', 
+                          border: '1px solid #e2e8f0', 
+                          borderRadius: '12px', 
+                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                          fontSize: '13px'
+                        }}
+                      />
+                      <Bar dataKey="count" radius={[8, 8, 0, 0]} maxBarSize={50}>
+                        {promotionsChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={PROMOTIONS_COLORS[entry.id] || '#003087'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 border-t border-gray-50 pt-4 space-y-2">
+              {promotionsChartData.map((stat) => (
+                <div key={stat.name} className="flex justify-between items-center py-2.5 px-3 hover:bg-gray-50 rounded-xl transition-all">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: PROMOTIONS_COLORS[stat.id] }} />
+                    <span className="font-semibold text-gray-700 text-sm">{stat.name}</span>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-gray-400 text-xs">{stat.count} {stat.count === 1 ? 'unidad' : 'unidades'}</span>
+                    <span className="font-bold text-gray-900 text-sm w-12 text-right">{stat.percentage}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* Comments/Suggestions Section */}
@@ -518,6 +614,10 @@ export default function Dashboard() {
                       <div className="flex items-center space-x-1.5 bg-white border border-gray-100 px-2 py-1 rounded-lg text-xs font-semibold text-gray-600">
                         {getMoodIcon(item.clarityOfService)}
                         <span>Claridad: {LABEL_MAP[item.clarityOfService]}</span>
+                      </div>
+                      <div className="flex items-center space-x-1.5 bg-white border border-gray-100 px-2 py-1 rounded-lg text-xs font-semibold text-gray-600">
+                        {getMoodIcon(item.joinPromotions)}
+                        <span>Promos: {LABEL_MAP[item.joinPromotions]}</span>
                       </div>
                     </div>
                     <p className="text-sm text-gray-700 italic leading-relaxed">

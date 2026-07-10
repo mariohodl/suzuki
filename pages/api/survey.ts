@@ -19,18 +19,19 @@ export default async function handler(
   try {
     await connectDB();
 
-    const { visitSatisfaction, clarityOfService, suggestion, branch } = req.body;
+    const { visitSatisfaction, clarityOfService, joinPromotions, suggestion, branch } = req.body;
 
-    if (!visitSatisfaction || !clarityOfService) {
+    if (!visitSatisfaction || !clarityOfService || !joinPromotions) {
       return res.status(400).json({
         success: false,
-        message: 'Los campos visitSatisfaction y clarityOfService son requeridos',
+        message: 'Los campos visitSatisfaction, clarityOfService y joinPromotions son requeridos',
       });
     }
 
     const survey = new SurveyResponse({
       visitSatisfaction,
       clarityOfService,
+      joinPromotions,
       suggestion: suggestion || '',
       branch: branch || 'Principal',
     });

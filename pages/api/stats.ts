@@ -51,6 +51,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       { $group: { _id: '$clarityOfService', count: { $sum: 1 } } }
     ]);
 
+    // Aggregate Join Promotions
+    const joinPromotionsStatsRaw = await SurveyResponse.aggregate([
+      { $match: query },
+      { $group: { _id: '$joinPromotions', count: { $sum: 1 } } }
+    ]);
+
     // Get Suggestions
     const recentSuggestions = await SurveyResponse.find({
       ...query,
@@ -78,12 +84,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
     });
 
+    const joinPromotionsStats = ['si', 'no'].map(key => {
+      const match = joinPromotionsStatsRaw.find(item => item._id === key);
+      return {
+        _id: key,
+        count: match ? match.count : 0
+      };
+    });
+
     return res.status(200).json({
       success: true,
       data: {
         total,
         visitStats,
         clarityStats,
+        joinPromotionsStats,
         recent: recentSuggestions,
         branches: branchesList
       }
