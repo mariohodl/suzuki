@@ -179,13 +179,12 @@ export default function SurveyPage() {
         {/* Main content */}
         <div className="flex-1 flex flex-col items-center justify-center px-6 overflow-hidden">
           <div
-            className={`w-full max-w-3xl flex flex-col items-center ${
-              isTransitioning
+            className={`w-full max-w-3xl flex flex-col items-center ${isTransitioning
                 ? slideDir === 'out'
                   ? 'slide-out'
                   : 'slide-in'
                 : 'slide-in'
-            }`}
+              }`}
           >
             {/* Step 1: Visit satisfaction */}
             {survey.step === 0 && (
@@ -298,17 +297,7 @@ export default function SurveyPage() {
                       {survey.suggestion.length}/500
                     </span>
                     <div className="flex gap-3 w-full sm:w-auto justify-end">
-                      <button
-                        onClick={handleSkipSuggestion}
-                        className="flex-1 sm:flex-none px-5 py-3 rounded-xl font-bold transition-all duration-200 active:scale-95 text-center"
-                        style={{
-                          color: '#003087',
-                          background: '#E2E8F0',
-                          fontSize: 'clamp(13px, 1.8vw, 16px)',
-                        }}
-                      >
-                        Omitir
-                      </button>
+
                       <button
                         onClick={handleSubmit}
                         disabled={isSubmitting}
@@ -322,6 +311,17 @@ export default function SurveyPage() {
                         }}
                       >
                         {isSubmitting ? 'Enviando...' : 'Enviar encuesta →'}
+                      </button>
+                      <button
+                        onClick={handleSkipSuggestion}
+                        className="flex-1 sm:flex-none px-5 py-3 rounded-xl font-bold transition-all duration-200 active:scale-95 text-center"
+                        style={{
+                          color: '#003087',
+                          background: '#E2E8F0',
+                          fontSize: 'clamp(13px, 1.8vw, 16px)',
+                        }}
+                      >
+                        Omitir
                       </button>
                     </div>
                   </div>
