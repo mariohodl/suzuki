@@ -292,16 +292,26 @@ export default function SurveyPage() {
                         : 'none',
                     }}
                   />
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full">
-                    <span className="text-sm text-right sm:text-left w-full sm:w-auto" style={{ color: '#94A3B8' }}>
+                  <div className="flex flex-col gap-3 w-full">
+                    <span className="text-sm text-center sm:text-left" style={{ color: '#94A3B8' }}>
                       {survey.suggestion.length}/500
                     </span>
-                    <div className="flex gap-3 w-full sm:w-auto justify-end">
-
+                    <div className="flex gap-3 w-full">
+                      <button
+                        onClick={handleSkipSuggestion}
+                        className="flex-1 px-5 py-3 rounded-xl font-bold transition-all duration-200 active:scale-95 text-center"
+                        style={{
+                          color: '#003087',
+                          background: '#E2E8F0',
+                          fontSize: 'clamp(13px, 1.8vw, 16px)',
+                        }}
+                      >
+                        Omitir
+                      </button>
                       <button
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        className="flex-[2] sm:flex-none px-8 py-3 rounded-xl font-bold text-white transition-all duration-200 active:scale-95 disabled:opacity-70 text-center flex items-center justify-center gap-2"
+                        className="flex-1 px-5 py-3 rounded-xl font-bold text-white transition-all duration-200 active:scale-95 disabled:opacity-70 text-center flex items-center justify-center gap-2"
                         style={{
                           background: isSubmitting
                             ? '#64748B'
@@ -311,17 +321,6 @@ export default function SurveyPage() {
                         }}
                       >
                         {isSubmitting ? 'Enviando...' : 'Enviar encuesta →'}
-                      </button>
-                      <button
-                        onClick={handleSkipSuggestion}
-                        className="flex-1 sm:flex-none px-5 py-3 rounded-xl font-bold transition-all duration-200 active:scale-95 text-center"
-                        style={{
-                          color: '#003087',
-                          background: '#E2E8F0',
-                          fontSize: 'clamp(13px, 1.8vw, 16px)',
-                        }}
-                      >
-                        Omitir
                       </button>
                     </div>
                   </div>
